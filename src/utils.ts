@@ -1,4 +1,6 @@
+import { Prisma } from '@prisma/client'
 import type { Handler, Context } from 'hono'
+import type { JwtVariables } from 'hono/jwt'
 
 export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
   const handler: Handler = async (ctx) => {
@@ -19,10 +21,23 @@ export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
       }
 
       return ctx.json({ data: resp })
-    } catch (error) {
-      console.error(error)
+    } catch (err) {
+      console.error(err)
+
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        return ctx.json({
+          error: `prisma error: ${err.code}`
+        })
+      }
+
+      if (err instanceof Error) {
+        return ctx.json({
+          error: err.message
+        })
+      }
+
       return ctx.json({
-        error: String(error)
+        error: String(err)
       })
     }
   }
@@ -30,6 +45,8 @@ export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
   return handler
 }
 
+type Variables = JwtVariables
+
 export interface RouteDefinition<Req, Resp> {
-  (req: Req, ctx: Context): Resp | Promise<Resp>
+  (req: Req, ctx: Context<{ Variables: Variables }>): Resp | Promise<Resp>
 }
