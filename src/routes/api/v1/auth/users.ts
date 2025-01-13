@@ -9,11 +9,11 @@ interface RequestParams {
 }
 
 export default defineRoute(async ({ query }: RequestParams, ctx) => {
-    let {size = 20, page = 0} = query
+  const { size = 20, page = 0 } = query
 
   const users = await prisma.user.findMany({
     omit: {
-      password:true
+      password: true,
     },
     skip: size * page,
     take: size,

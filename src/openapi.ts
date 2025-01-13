@@ -1,10 +1,11 @@
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
 import { Hono } from 'hono'
-import path from 'path'
 import type { RouteConfig } from 'openapi-ts-define'
-import { readFile } from 'fs/promises'
-import { swaggerUI } from '@hono/swagger-ui'
-import { IS_DEV_MODE } from './env'
 import { ROUTES_DIR } from './config'
+import { IS_DEV_MODE } from './env'
+import { pathToFileURL } from 'node:url'
+import { swaggerUI } from '@hono/swagger-ui'
 
 export async function registerOpenapiRoutes(app: Hono) {
   const config = await getOpenapiConfig()
@@ -18,9 +19,9 @@ export async function registerOpenapiRoutes(app: Hono) {
 
 async function getOpenapiConfig() {
   if (IS_DEV_MODE) {
-    // Use a variable to avoid tsup to compile scripts/*.ts
-    const makeItOnlyWorksAtDevMode = '../scripts/utils'
-    const { generateOpenapiConfig } = await import(makeItOnlyWorksAtDevMode)
+    const utilsFile = pathToFileURL(path.resolve('scripts/utils.ts'))
+
+    const { generateOpenapiConfig } = await import(utilsFile.toString())
 
     console.log('generating openapi config...')
     const result = generateOpenapiConfig()
@@ -29,13 +30,11 @@ async function getOpenapiConfig() {
   }
 
   const openapiJsonContent = await readFile('generated/openapi.json', 'utf8')
-  const routes: RouteConfig[] = JSON.parse(
-    await readFile('generated/routes.json', 'utf8')
-  )
+  const routes: RouteConfig[] = JSON.parse(await readFile('generated/routes.json', 'utf8'))
 
   return {
     schema: JSON.parse(openapiJsonContent),
-    routes
+    routes,
   }
 }
 
@@ -43,12 +42,9 @@ async function registerRoutes(routes: RouteConfig[]) {
   const _app = new Hono()
 
   for (const route of routes) {
-    const jsFile = path.join(
-      ROUTES_DIR,
-      route.meta.filepath.replace(/\.ts$/, '.js')
-    )
+    const jsFile = pathToFileURL(path.join(ROUTES_DIR, route.meta.filepath))
 
-    const handler = (await import(jsFile)).default
+    const handler = (await import(jsFile.toString())).default
 
     _app[route.method as 'get'](route.path, handler)
   }

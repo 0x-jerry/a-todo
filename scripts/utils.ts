@@ -11,9 +11,23 @@ export function generateOpenapiConfig() {
     openAPI: {
       info: {
         version: '1.0.0',
-        title: 'test spec'
-      }
-    }
+        title: 'test spec',
+      },
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
+    },
   })
 
   return result

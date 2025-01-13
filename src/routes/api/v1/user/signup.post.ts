@@ -14,6 +14,6 @@ export default defineRoute(async ({ body }: RequestParams, ctx) => {
     data: {
       email: body.email,
       password: body.password,
-    }
+    },
   })
 })
