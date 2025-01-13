@@ -4,5 +4,22 @@ model Todo {
     updatedAt DateTime @updatedAt
 
     userId Int
-    title  String
+
+    title    String
+    // the bigger the more important
+    priority Int     @default(0)
+    note     String?
+
+    done   Boolean   @default(false)
+    doneAt DateTime?
+
+    collectionId Int?
+}
+
+model Collection {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    name String
 }
