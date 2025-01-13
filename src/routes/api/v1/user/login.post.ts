@@ -1,5 +1,6 @@
 import { prisma } from '@/database'
 import { APP_SECRET } from '@/env'
+import { comparePassword } from '@/services/cryption'
 import { defineRoute } from '@/utils'
 import dayjs from 'dayjs'
 import { sign } from 'hono/jwt'
@@ -13,18 +14,20 @@ interface RequestParams {
 
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
   const user = await prisma.user.findFirst({
-    omit: {
-      password: true,
-    },
     where: {
       email: body.email,
-      password: body.password,
     },
   })
 
   if (!user) {
     throw Error('Login failed!')
   }
+
+  if (!(await comparePassword(body.password, user.password))) {
+    throw Error('Login failed!')
+  }
+
+  Reflect.deleteProperty(user, 'password')
 
   const token = await sign(
     {

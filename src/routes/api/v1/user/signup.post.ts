@@ -1,4 +1,5 @@
 import { prisma } from '@/database'
+import { cryptPassword } from '@/services/cryption'
 import { defineRoute } from '@/utils'
 
 interface RequestParams {
@@ -13,7 +14,7 @@ export default defineRoute(async ({ body }: RequestParams, ctx) => {
   await prisma.user.create({
     data: {
       email: body.email,
-      password: body.password,
+      password: await cryptPassword(body.password),
     },
   })
 })
