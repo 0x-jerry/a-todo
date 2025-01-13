@@ -1,0 +1,3 @@
+import path from 'path'
+
+export const ROUTES_DIR = path.join(import.meta.dirname, 'routes')
