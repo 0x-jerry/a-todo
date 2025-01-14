@@ -1,7 +1,7 @@
 import { prisma } from '@/database'
 import { APP_REFRESH_SECRET, APP_SECRET } from '@/env'
 import { kv } from '@/services/kv'
-import { defineRoute } from '@/utils'
+import { defineRoute } from '@/define'
 import dayjs from 'dayjs'
 import { decode, sign } from 'hono/jwt'
 

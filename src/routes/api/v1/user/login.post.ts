@@ -2,7 +2,7 @@ import { prisma } from '@/database'
 import { APP_REFRESH_SECRET, APP_SECRET } from '@/env'
 import { comparePassword } from '@/services/cryption'
 import { kv } from '@/services/kv'
-import { defineRoute } from '@/utils'
+import { defineRoute } from '@/define'
 import dayjs from 'dayjs'
 import { sign } from 'hono/jwt'
 

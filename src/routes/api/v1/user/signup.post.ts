@@ -1,6 +1,6 @@
 import { prisma } from '@/database'
 import { cryptPassword } from '@/services/cryption'
-import { defineRoute } from '@/utils'
+import { defineRoute } from '@/define'
 
 interface RequestParams {
   body: {

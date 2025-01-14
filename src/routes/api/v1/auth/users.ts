@@ -1,5 +1,5 @@
 import { prisma } from '@/database'
-import { defineRoute } from '@/utils'
+import { defineRoute } from '@/define'
 
 interface RequestParams {
   query: {
