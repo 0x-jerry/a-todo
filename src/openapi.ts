@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { Hono, type Context } from 'hono'
-import type { RouteConfig, RouteRequestParam } from 'openapi-ts-define'
+import type { openapiPreset, RouteConfig, RouteRequestParam } from 'openapi-ts-define'
 import { ROUTES_DIR } from './config'
 import { IS_DEV_MODE } from './env'
 import { pathToFileURL } from 'node:url'
@@ -11,21 +11,23 @@ import type { IRequestParams, RouteHandler } from './define'
 import { Prisma } from '@prisma/client'
 
 // biome-ignore lint/suspicious/noExplicitAny: todo, update interface
-type JSONSchame = any
+type JSONSchema = any
 
-const ajv = new Ajv({})
+type OpenapiTsResult = ReturnType<typeof openapiPreset>
+
+const ajv = new Ajv({ strict: false })
 
 export async function registerOpenapiRoutes(app: Hono) {
   const config = await getOpenapiConfig()
   app.get('/_openapi', (ctx) => ctx.json(config.schema))
   app.get('/_doc', swaggerUI({ url: '/_openapi' }))
 
-  const apiRouter = await registerRoutes(config.routes)
+  const apiRouter = await registerRoutes(config.routes, config.schema)
 
   app.route('/', apiRouter)
 }
 
-async function getOpenapiConfig() {
+async function getOpenapiConfig(): Promise<OpenapiTsResult> {
   if (IS_DEV_MODE) {
     const utilsFile = pathToFileURL(path.resolve('scripts/utils.ts'))
 
@@ -46,7 +48,7 @@ async function getOpenapiConfig() {
   }
 }
 
-async function registerRoutes(routes: RouteConfig[]) {
+async function registerRoutes(routes: RouteConfig[], openapiSchema: OpenapiTsResult['schema']) {
   const _app = new Hono()
 
   for (const route of routes) {
@@ -56,7 +58,7 @@ async function registerRoutes(routes: RouteConfig[]) {
 
     handler._validateQuery = await createValidateParamsFn(route.request?.query)
     handler._validateParams = await createValidateParamsFn(route.request?.params)
-    handler._validateBody = await createValidateBodyFn(route.request?.body)
+    handler._validateBody = await createValidateBodyFn(route.request?.body, openapiSchema)
 
     _app[route.method as 'get'](route.path, async (ctx) => {
       const resp = await catchError(ctx, async () => {
@@ -102,14 +104,20 @@ async function catchError(ctx: Context, fn: () => Promise<Response>) {
   }
 }
 
-async function createValidateBodyFn(bodySchema: JSONSchame) {
+async function createValidateBodyFn(
+  bodySchema: JSONSchema,
+  openapiSchema: OpenapiTsResult['schema'],
+) {
   if (!bodySchema) {
     return
   }
 
   const schema = bodySchema
 
-  const validateFn = ajv.compile(schema)
+  const validateFn = ajv.compile({
+    ...schema,
+    components: openapiSchema.components,
+  })
 
   return (data: unknown) => {
     if (!validateFn(data)) {
@@ -123,7 +131,7 @@ async function createValidateParamsFn(configs?: RouteRequestParam[]) {
     return
   }
 
-  const schema: JSONSchame = {
+  const schema: JSONSchema = {
     type: 'object',
     properties: {},
     required: [],

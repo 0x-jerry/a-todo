@@ -1,23 +1,23 @@
 import { prisma } from '@/database'
 import { defineRoute } from '@/define'
+import type { IPagination } from '@/types'
 
 interface RequestParams {
-  body: {
-    title: string
-  }
+  body: IPagination
 }
 
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
-  const { title } = body
+  const { page = 0, size = 20 } = body
 
   const userId = ctx.get('jwtPayload').id
 
-  const todo = await prisma.todo.create({
-    data: {
+  const todos = await prisma.todo.findMany({
+    where: {
       userId,
-      title,
-    }
+    },
+    skip: page * size,
+    take: size,
   })
 
-  return todo
+  return todos
 })

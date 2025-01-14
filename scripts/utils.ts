@@ -23,7 +23,6 @@ export function generateOpenapiConfig() {
           bearerAuth: {
             type: 'http',
             scheme: 'bearer',
-            bearerFormat: 'JWT',
           },
         },
       },
