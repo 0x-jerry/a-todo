@@ -11,10 +11,7 @@ const utils = {
 }
 
 export interface KVOption {
-  /**
-   * in seconds
-   */
-  expire: number
+  expireIn: Date 
 }
 
 class KV {
@@ -48,10 +45,6 @@ class KV {
     const serializedKey = utils.serialize(key)
     const serializedVal = utils.serialize(val)
 
-    let expire: Date | undefined = undefined
-    if (opt?.expire && opt.expire > 0) {
-      expire = dayjs().add(opt.expire, 's').toDate()
-    }
 
     const kv = await prisma.kv.upsert({
       where: {
@@ -60,11 +53,11 @@ class KV {
       create: {
         key: serializedKey,
         value: serializedVal,
-        expireIn: expire,
+        expireIn: opt?.expireIn,
       },
       update: {
         value: serializedVal,
-        expireIn: expire,
+        expireIn: opt?.expireIn,
       },
     })
 

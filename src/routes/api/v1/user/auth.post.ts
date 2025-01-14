@@ -1,31 +1,34 @@
 import { prisma } from '@/database'
 import { APP_REFRESH_SECRET, APP_SECRET } from '@/env'
-import { comparePassword } from '@/services/cryption'
 import { kv } from '@/services/kv'
 import { defineRoute } from '@/utils'
 import dayjs from 'dayjs'
-import { sign } from 'hono/jwt'
+import { decode, sign } from 'hono/jwt'
 
 interface RequestParams {
   body: {
-    email: string
-    password: string
+    refreshToken: string
   }
 }
 
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
+  const { refreshToken } = body
+  if ((await kv.get(refreshToken)) !== true) {
+    throw new Error('Exchange failed: 0x00')
+  }
+
+  const data = decode(refreshToken)
+
+  const userId = data.payload.id as number
+
   const user = await prisma.user.findFirst({
     where: {
-      email: body.email,
+      id: userId,
     },
   })
 
   if (!user) {
-    throw Error('Login failed!')
-  }
-
-  if (!(await comparePassword(body.password, user.password))) {
-    throw Error('Login failed!')
+    throw new Error('Exchange failed: 0x01')
   }
 
   Reflect.deleteProperty(user, 'password')
@@ -39,7 +42,7 @@ export default defineRoute(async ({ body }: RequestParams, ctx) => {
   )
 
   const expDate = dayjs().add(30, 'd')
-  const refreshToken = await sign(
+  const newRefreshToken = await sign(
     {
       id: user.id,
       exp: expDate.valueOf(),
@@ -47,11 +50,12 @@ export default defineRoute(async ({ body }: RequestParams, ctx) => {
     APP_REFRESH_SECRET,
   )
 
-  await kv.set(refreshToken, true, { expireIn: expDate.toDate() })
+  await kv.remove(refreshToken)
+  await kv.set(newRefreshToken, true, { expireIn: expDate.toDate() })
 
   return {
     user,
     token,
-    refreshToken,
+    newRefreshToken,
   }
 })

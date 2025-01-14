@@ -1,5 +1,8 @@
 import * as env from './env'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
 import { serve } from '@hono/node-server'
+dayjs.extend(duration)
 
 await preCheck()
 
