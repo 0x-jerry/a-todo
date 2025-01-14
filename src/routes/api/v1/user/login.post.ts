@@ -1,4 +1,4 @@
-import { prisma } from '@/database'
+import { prisma } from '@/services/database'
 import { APP_REFRESH_SECRET, APP_SECRET } from '@/env'
 import { comparePassword } from '@/services/cryption'
 import { kv } from '@/services/kv'

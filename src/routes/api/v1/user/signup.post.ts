@@ -1,4 +1,4 @@
-import { prisma } from '@/database'
+import { prisma } from '@/services/database'
 import { cryptPassword } from '@/services/cryption'
 import { defineRoute } from '@/define'
 

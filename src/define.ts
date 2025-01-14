@@ -31,7 +31,12 @@ export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
   return handler
 }
 
-type Variables = JwtVariables
+type Variables = JwtVariables<{
+  /**
+   * user id
+   */
+  id: number
+}>
 
 export type RouteDefinition<Req, Resp> = (
   req: Req,

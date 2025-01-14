@@ -1,4 +1,4 @@
-import { prisma } from '@/database'
+import { prisma } from '@/services/database'
 import { defineRoute } from '@/define'
 import type { IPagination } from '@/types'
 

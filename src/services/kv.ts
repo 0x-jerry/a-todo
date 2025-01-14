@@ -1,4 +1,4 @@
-import { prisma } from '@/database'
+import { prisma } from '@/services/database'
 import dayjs from 'dayjs'
 
 const utils = {
@@ -11,7 +11,7 @@ const utils = {
 }
 
 export interface KVOption {
-  expireIn: Date 
+  expireIn: Date
 }
 
 class KV {
@@ -44,7 +44,6 @@ class KV {
   async set(key: unknown, val: unknown, opt?: KVOption) {
     const serializedKey = utils.serialize(key)
     const serializedVal = utils.serialize(val)
-
 
     const kv = await prisma.kv.upsert({
       where: {

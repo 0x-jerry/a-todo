@@ -1,4 +1,4 @@
-import { prisma } from '@/database'
+import { prisma } from '@/services/database'
 import { APP_REFRESH_SECRET, APP_SECRET } from '@/env'
 import { kv } from '@/services/kv'
 import { defineRoute } from '@/define'

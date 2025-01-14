@@ -1,4 +1,4 @@
-import { prisma } from '@/database'
+import { prisma } from '@/services/database'
 import { defineRoute } from '@/define'
 
 interface RequestParams {
@@ -16,7 +16,7 @@ export default defineRoute(async ({ body }: RequestParams, ctx) => {
     data: {
       userId,
       title,
-    }
+    },
   })
 
   return todo
