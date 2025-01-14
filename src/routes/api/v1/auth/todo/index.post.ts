@@ -1,23 +1,30 @@
 import { prisma } from '@/services/database'
 import { defineRoute } from '@/define'
 import type { IPagination } from '@/types'
+import { getPrismaPaginationQuery } from '@/utils/pagination'
 
 interface RequestParams {
   body: IPagination
 }
 
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
-  const { page = 0, size = 20 } = body
-
   const userId = ctx.get('jwtPayload').id
 
   const todos = await prisma.todo.findMany({
     where: {
       userId,
     },
-    skip: page * size,
-    take: size,
+    ...getPrismaPaginationQuery(body),
   })
 
-  return todos
+  const total = await prisma.todo.count({
+    where: {
+      userId,
+    },
+  })
+
+  return {
+    total,
+    data: todos,
+  }
 })

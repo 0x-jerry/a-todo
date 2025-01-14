@@ -2,10 +2,10 @@ import type { Context } from 'hono'
 import type { JwtVariables } from 'hono/jwt'
 
 export interface IRequestParams {
-  query: Record<string, string>
-  params: Record<string, string>
+  query?: Record<string, string>
+  params?: Record<string, string>
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  body: any
+  body?: any
 }
 
 export interface RouteHandler {
@@ -16,7 +16,7 @@ export interface RouteHandler {
   _validateParams?: (data: unknown) => void
 }
 
-export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
+export function defineRoute<Req extends IRequestParams, Resp>(route: RouteDefinition<Req, Resp>) {
   const handler: RouteHandler = async (reqParams: IRequestParams, ctx: Context) => {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     const resp = await route(reqParams as any, ctx)
@@ -38,7 +38,7 @@ type Variables = JwtVariables<{
   id: number
 }>
 
-export type RouteDefinition<Req, Resp> = (
+export type RouteDefinition<Req extends IRequestParams, Resp> = (
   req: Req,
   ctx: Context<{ Variables: Variables }>,
 ) => Resp | Promise<Resp>
