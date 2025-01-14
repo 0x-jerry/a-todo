@@ -7,6 +7,9 @@ interface RequestParams {
   }
 }
 
+/**
+ * @api.name create a todo
+ */
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
   const { title } = body
 

@@ -7,6 +7,9 @@ interface RequestParams {
   body: IPagination
 }
 
+/**
+ * @api.name list todos
+ */
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
   const userId = ctx.get('jwtPayload').id
 

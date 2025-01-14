@@ -11,6 +11,9 @@ interface RequestParams {
   }
 }
 
+/**
+ * @api.name exchange token
+ */
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
   const { refreshToken } = body
   if (!refreshToken) {

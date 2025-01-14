@@ -13,6 +13,9 @@ interface RequestParams {
   }
 }
 
+/**
+ * @api.name login
+ */
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
   const user = await prisma.user.findFirst({
     where: {

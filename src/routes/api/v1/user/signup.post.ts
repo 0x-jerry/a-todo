@@ -10,6 +10,9 @@ interface RequestParams {
   }
 }
 
+/**
+ * @api.name signup
+ */
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
   await prisma.user.create({
     data: {
