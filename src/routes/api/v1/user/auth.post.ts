@@ -13,6 +13,10 @@ interface RequestParams {
 
 export default defineRoute(async ({ body }: RequestParams, ctx) => {
   const { refreshToken } = body
+  if (!refreshToken) {
+    throw new Error('Exchange failed: 0x00')
+  }
+
   if ((await kv.get(refreshToken)) !== true) {
     throw new Error('Exchange failed: 0x00')
   }

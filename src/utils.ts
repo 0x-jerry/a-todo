@@ -4,15 +4,15 @@ import type { JwtVariables } from 'hono/jwt'
 
 export const defineRoute = <Req, Resp>(route: RouteDefinition<Req, Resp>) => {
   const handler: Handler = async (ctx) => {
-    const isSimpleRequest = (method: string) => ['get', 'delete'].includes(method.toLowerCase())
-
-    const requestParams = {
-      query: ctx.req.query(),
-      params: ctx.req.param(),
-      body: isSimpleRequest(ctx.req.method) ? {} : await ctx.req.json(),
-    }
-
     try {
+      const isSimpleRequest = (method: string) => ['get', 'delete'].includes(method.toLowerCase())
+
+      const requestParams = {
+        query: ctx.req.query(),
+        params: ctx.req.param(),
+        body: isSimpleRequest(ctx.req.method) ? {} : await ctx.req.json(),
+      }
+
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       const resp = await route(requestParams as any, ctx)
 
