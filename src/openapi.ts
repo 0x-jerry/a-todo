@@ -9,6 +9,11 @@ import { swaggerUI } from '@hono/swagger-ui'
 import Ajv, { type ErrorObject } from 'ajv'
 import type { IRequestParams, RouteHandler } from './define'
 import { Prisma } from '@prisma/client'
+import { appLogger } from './services/logger'
+
+const logger = appLogger.child({
+  name: 'openapi',
+})
 
 // biome-ignore lint/suspicious/noExplicitAny: todo, update interface
 type JSONSchema = any
@@ -33,9 +38,9 @@ async function getOpenapiConfig(): Promise<OpenapiTsResult> {
 
     const { generateOpenapiConfig } = await import(utilsFile.toString())
 
-    console.log('generating openapi config...')
+    logger.info('generating openapi config...')
     const result = generateOpenapiConfig()
-    console.log('generate openapi done!')
+    logger.info('generate openapi config done!')
     return result
   }
 
@@ -84,7 +89,7 @@ async function catchError(ctx: Context, fn: () => Promise<Response>) {
 
     return resp
   } catch (err) {
-    console.error(err)
+    appLogger.error('request error: %o', err)
 
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       return ctx.json({
@@ -182,7 +187,7 @@ async function getRequestParams(ctx: Context) {
     try {
       body = await ctx.req.json()
     } catch (error) {
-      console.error(error)
+      appLogger.error('parse body error: %o', error)
     }
 
     return body

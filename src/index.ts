@@ -1,8 +1,12 @@
 import * as env from './env'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 import { serve } from '@hono/node-server'
+import { appLogger } from './services/logger'
+
 dayjs.extend(duration)
+dayjs.extend(relativeTime)
 
 await preCheck()
 
@@ -17,9 +21,11 @@ async function start() {
       fetch: app.fetch,
     },
     (info) => {
-      console.log('service serve at:', `http://localhost:${info.port}`)
+      appLogger.info('service serve at: %s', `http://localhost:${info.port}`)
     },
   )
+
+  await import('./cronjobs')
 }
 
 async function preCheck() {
