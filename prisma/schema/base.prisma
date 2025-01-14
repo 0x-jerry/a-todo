@@ -8,3 +8,12 @@ model User {
     password String
     isAdmin  Boolean?
 }
+
+model Kv {
+    key String @unique
+    value String
+
+    expireIn DateTime?
+
+    @@index([key])
+}
