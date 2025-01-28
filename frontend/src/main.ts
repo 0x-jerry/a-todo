@@ -5,6 +5,8 @@ import App from './App.vue'
 
 import './styles/global.less'
 import 'uno.css'
+import { apiV1AuthUserValidateGet } from './api/todo'
+import { router } from './modules/router'
 
 const app = createApp(App)
 
@@ -27,4 +29,19 @@ Object.values(import.meta.glob<{ install: Plugin }>('./modules/*.ts', { eager: t
   },
 )
 
-app.mount('#app')
+start()
+
+async function start() {
+  const isLoginPage = router.currentRoute.value.path === '/login'
+
+  if (!isLoginPage) {
+    try {
+      await apiV1AuthUserValidateGet()
+    } catch (error) {
+      console.error(error)
+      router.push('/login')
+    }
+  }
+
+  app.mount('#app')
+}

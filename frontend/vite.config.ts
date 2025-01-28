@@ -52,6 +52,14 @@ export default defineConfig(() => {
       // https://github.com/unocss/unocss
       Unocss(),
     ],
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3560',
+          changeOrigin: true,
+        },
+      },
+    },
     test: {
       globals: true,
     },
