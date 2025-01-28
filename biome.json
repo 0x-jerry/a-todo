@@ -28,7 +28,8 @@
   },
   "files": {
     "ignore": [
-      "*.json"
+      "*.json",
+      "frontend/src/api/**/*.ts"
     ]
   },
   "javascript": {
