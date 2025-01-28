@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/index.ts",
+    "dev:ui": "npm run -C frontend dev",
     "start": "node dist/index.js",
     "build": "npm run openapi && tsup",
     "db:migrate": "prisma migrate dev --name update",
