@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-const count = ref(0)
 </script>
 
 <template>
   <v-layout class="rounded rounded-md">
-    <v-app-bar color="surface-variant" title="Application bar"></v-app-bar>
+    <v-app-bar color="surface-variant" title="A Todo">
+      <template v-slot:prepend>
+        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+      </template>
+    </v-app-bar>
 
     <v-navigation-drawer>
       <v-list>

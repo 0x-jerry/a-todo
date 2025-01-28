@@ -1,5 +1,5 @@
 // settings.scss
 @use "vuetify/settings" with (
-  $color-pack: false,
-  $utilities: false
+  $color-pack: true,
+  $utilities: true
 );
